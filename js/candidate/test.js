@@ -4,7 +4,7 @@ let T=null;   // live exam state
 
 export async function vTest([id]){shell('<p>Loading…</p>');
  const d=await ok(db.rpc('get_attempt',{p_attempt:id}));if(d.attempt.status!=='in_progress')return location.hash='#/result/'+id;
- const st=d.stage,secs=d.sections;let c=0;secs.forEach(s=>{s.from=c;c+=s.duration_min||0});
+ const st=d.stage,secs=d.sections,ser=d.attempt.series_id?(await db.from('test_series').select('name').eq('id',d.attempt.series_id).single()).data?.name||'':'';let c=0;secs.forEach(s=>{s.from=c;c+=s.duration_min||0});
  const lock=st.sections_locked&&secs.every(s=>s.duration_min),t0=new Date(d.attempt.started_at).getTime();
  T={id,d,Q:d.questions,ans:d.attempt.answers||{},marked:d.attempt.marked||{},vis:{},cur:0,lock,end:t0+st.duration_min*6e4,off:new Date(d.now)-Date.now()};
  const secEnd=s=>t0+(s.from+s.duration_min)*6e4,now=()=>Date.now()+T.off,
@@ -17,7 +17,7 @@ export async function vTest([id]){shell('<p>Loading…</p>');
  function draw(){const q=T.Q[T.cur],S=secs.find(s=>s.id===q.section_id),si=secs.indexOf(S);T.vis[q.id]=1;
   const inS=T.Q.map((x,i)=>[x,i]).filter(([x])=>x.section_id===S.id),n=inS.findIndex(([x])=>x.id===q.id)+1,sel=T.ans[q.id];
   const cn=k=>inS.filter(([x])=>stat(x)===k).length;
-  app.innerHTML=`<div class=ex><div class=exh><b>${esc(st.name)}</b><span>Candidate: ${esc(state.me.full_name)}</span><span>${lock?`Section time <span class=tm id=st>--</span> `:''}Total <span class=tm id=tm>--</span></span></div>
+  app.innerHTML=`<div class=ex><div class=exh><b>${esc(ser)} · ${esc(st.name)}</b><span>Candidate: ${esc(state.me.full_name)}</span><span>${lock?`Section time <span class=tm id=st>--</span> `:''}Total <span class=tm id=tm>--</span></span></div>
   <div class=tabs>${secs.map((s,i)=>`<button data-sec="${i}" class="${i===si?'on':''}" ${lock&&i!==si?'disabled':''}>${esc(s.name)}</button>`).join('')}</div>
   <div class=exb><div class=qp><p class=muted>Question ${n} of ${inS.length} · <span class=ok>+${S.marks_per_q}</span> ${+st.negative_mark?`<span class=bad>−${+(st.negative_mark*S.marks_per_q).toFixed(2)}</span>`:''}</p>
   <p style="font-size:17px;white-space:pre-wrap">${esc(q.question)}</p>${q.image_url?`<img src="${esc(q.image_url)}" alt="Question image">`:''}
