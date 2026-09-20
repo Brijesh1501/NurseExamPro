@@ -1,4 +1,4 @@
-import {db,S,$,esc,fmt,ok,cnt,negTxt,shell} from '../core.js';
+import {db,S as state,$,esc,fmt,ok,cnt,negTxt,shell} from '../core.js';
 
 let T=null;   // live exam state
 
@@ -17,7 +17,7 @@ export async function vTest([id]){shell('<p>Loading…</p>');
  function draw(){const q=T.Q[T.cur],S=secs.find(s=>s.id===q.section_id),si=secs.indexOf(S);T.vis[q.id]=1;
   const inS=T.Q.map((x,i)=>[x,i]).filter(([x])=>x.section_id===S.id),n=inS.findIndex(([x])=>x.id===q.id)+1,sel=T.ans[q.id];
   const cn=k=>inS.filter(([x])=>stat(x)===k).length;
-  app.innerHTML=`<div class=ex><div class=exh><b>${esc(st.name)}</b><span>Candidate: ${esc(S.me.full_name)}</span><span>${lock?`Section time <span class=tm id=st>--</span> `:''}Total <span class=tm id=tm>--</span></span></div>
+  app.innerHTML=`<div class=ex><div class=exh><b>${esc(st.name)}</b><span>Candidate: ${esc(state.me.full_name)}</span><span>${lock?`Section time <span class=tm id=st>--</span> `:''}Total <span class=tm id=tm>--</span></span></div>
   <div class=tabs>${secs.map((s,i)=>`<button data-sec="${i}" class="${i===si?'on':''}" ${lock&&i!==si?'disabled':''}>${esc(s.name)}</button>`).join('')}</div>
   <div class=exb><div class=qp><p class=muted>Question ${n} of ${inS.length} · <span class=ok>+${S.marks_per_q}</span> ${+st.negative_mark?`<span class=bad>−${+(st.negative_mark*S.marks_per_q).toFixed(2)}</span>`:''}</p>
   <p style="font-size:17px;white-space:pre-wrap">${esc(q.question)}</p>${q.image_url?`<img src="${esc(q.image_url)}" alt="Question image">`:''}
@@ -36,7 +36,7 @@ export async function vTest([id]){shell('<p>Loading…</p>');
  function tick(){const n=now(),left=(T.end-n)/1e3;if($('#tm')){$('#tm').textContent=fmt(left);$('#tm').classList.toggle('low',left<300)}
   if(lock&&$('#st'))$('#st').textContent=fmt((secEnd(secs[T.sec])-n)/1e3)}
  async function submit(auto){if(!auto&&!confirm(`Answered ${Object.keys(T.ans).length} of ${T.Q.length}. Submit the test? This cannot be undone.`))return;
-  clearInterval(S.timer);window.onbeforeunload=null;await ok(db.rpc('submit_attempt',{p_attempt:id,p_answers:T.ans}));location.hash='#/result/'+id}
+  clearInterval(state.timer);window.onbeforeunload=null;await ok(db.rpc('submit_attempt',{p_attempt:id,p_answers:T.ans}));location.hash='#/result/'+id}
  draw();
- S.timer=setInterval(()=>{if(T.end-now()<=0)return submit(true);tick();
+ state.timer=setInterval(()=>{if(T.end-now()<=0)return submit(true);tick();
   if(lock){const s=curSec();if(s!==T.sec){T.sec=s;T.cur=T.Q.findIndex(x=>x.section_id===secs[s].id);draw()}}},1000)}
