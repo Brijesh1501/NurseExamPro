@@ -53,7 +53,9 @@ export async function aImport(){adm('<p>Loading…</p>');const{stg,series,serHtm
    if(!sheetEntry)return $('#pv').innerHTML='<p class=bad>No .xlsx or .csv file found inside the zip.</p>';
    const imgFiles=new Map();
    Object.values(zip.files).forEach(f=>{if(!f.dir&&/\.(jpe?g|png|gif|webp)$/i.test(f.name))imgFiles.set(f.name.split(/[\\/]/).pop().toLowerCase(),f)});
-   const buf=await sheetEntry.async('arraybuffer'),wb=XLSX.read(buf,{type:'array'}),data=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:''});
+   let data;
+   if(/\.csv$/i.test(sheetEntry.name)){const text=await sheetEntry.async('string');data=Papa.parse(text,{header:true,skipEmptyLines:true}).data}
+   else{const buf=await sheetEntry.async('arraybuffer'),wb=XLSX.read(buf,{type:'array'});data=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:''})}
    const err=[],rows=data.map((r,i)=>parseRow(r,i,S(),err));
    preview(rows,err,imgFiles)}
   else if(name.endsWith('.xlsx')||name.endsWith('.xls')){
