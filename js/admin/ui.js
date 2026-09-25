@@ -2,7 +2,7 @@ import {db,S,$,esc,fmt,ok,cnt,negTxt,shell} from '../core.js';
 
 export const QF={ser:null,sec:null,edit:null};   // question-bank selection state
 
-export function adm(html){shell(`<div class=sub>${[['','Dashboard'],['exams','Exams & structure'],['questions','Question bank'],['import','CSV import'],['attempts','Attempts & results'],['users','Users']].map(([h,t])=>`<a href="#/admin/${h}">${t}</a>`).join('')}</div>${html}`)}
+export function adm(html){shell(`<div class=sub>${[['','Dashboard'],['exams','Exams & structure'],['questions','Question bank'],['import','CSV import'],['pyq','PYQ papers'],['pyqquestions','PYQ questions'],['pyqimport','PYQ import'],['attempts','Attempts & results'],['users','Users']].map(([h,t])=>`<a href="#/admin/${h}">${t}</a>`).join('')}</div>${html}`)}
 
 export function grid(el,table,rows,F,def,extra,reload){
  const cell=(f,v)=>Array.isArray(f[2])?`<select data-k="${f[0]}">${f[2].map(o=>`<option ${o==v?'selected':''}>${o}`).join('')}</select>`:f[2]==='bool'?`<input type=checkbox data-k="${f[0]}" ${v?'checked':''}>`:f[2]==='json'?`<input data-k="${f[0]}" data-j="1" value="${esc(JSON.stringify(v??{}))}">`:`<input data-k="${f[0]}" data-n="${f[2]==='number'?1:''}" ${f[2]==='number'?'type=number step=any':''} value="${esc(v??'')}">`;
