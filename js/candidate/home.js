@@ -13,7 +13,7 @@ export async function vExam([id]){shell('<p>Loading…</p>');
  const e=await ok(db.from('exams').select('*,test_series(*),exam_stages(*,sections(*)),pyq_papers(*)').eq('id',id).single());
  const pyq=(e.pyq_papers||[]).filter(p=>p.is_active).sort((a,b)=>a.ord-b.ord);
  const stages=e.exam_stages.filter(s=>s.is_active).sort((a,b)=>a.ord-b.ord),series=e.test_series.filter(s=>s.is_active).sort((a,b)=>a.ord-b.ord);
- $('.wrap').innerHTML=`<h2>${esc(e.name)}</h2><div class=card><h3>Exam pattern</h3>${stages.map(s=>{const S=s.sections.sort((a,b)=>a.ord-b.ord),n=S.reduce((t,x)=>t+x.question_count,0),m=S.reduce((t,x)=>t+x.question_count*x.marks_per_q,0);
+ $('.wrap').innerHTML=`<h2>${esc(e.name)}</h2><p><a class="btn ghost" href="#/analytics/${id}">View performance analytics</a></p><div class=card><h3>Exam pattern</h3>${stages.map(s=>{const S=s.sections.sort((a,b)=>a.ord-b.ord),n=S.reduce((t,x)=>t+x.question_count,0),m=S.reduce((t,x)=>t+x.question_count*x.marks_per_q,0);
   return`<h4 style="margin-bottom:4px">${esc(s.name)}</h4><p><span class=tag>${n} questions</span><span class=tag>${m} marks</span><span class=tag>${s.duration_min} min</span><span class=tag>Negative: ${negTxt(s.negative_mark)}</span>${s.sections_locked?'<span class=tag>Timed sections, locked after time</span>':''}</p>
   <div class=scroll><table><tr><th>Section<th>Questions<th>Time</tr>${S.map(x=>`<tr><td>${esc(x.name)}<td>${x.question_count}<td>${x.duration_min?x.duration_min+' min':'Shared'}`).join('')}</table></div>`}).join('')}
   <ul><li>Do not refresh or close the window; progress is saved and the timer keeps running.</li><li>Use Mark for Review to flag questions. Marked answers are still evaluated.</li><li>The test submits automatically when time ends.</li></ul>

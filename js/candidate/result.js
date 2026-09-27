@@ -9,5 +9,6 @@ export async function vResult([id]){shell('<p>Loading…</p>');
  $('.wrap').innerHTML=`<h2>${esc(s.exam_name)} · ${esc(serName)} · ${esc(s.name)}</h2><div class=card><h1 style="margin:0">${+(+a.score).toFixed(2)} / ${a.total} <small class=muted>(${pct.toFixed(1)}%)</small></h1>
  <p>Correct ${a.correct} · Wrong ${a.wrong} · Unattempted ${un}</p>${cut!=null?`<p>Category ${esc(r.category)} cut-off ${cut}%: <span class="${pct>=cut?'ok':'bad'}">${pct>=cut?'Qualified':'Not qualified'}</span></p>`:''}</div>
  <div class=scroll><table><tr><th>Section<th>Questions<th>Correct<th>Wrong<th>Marks</tr>${a.section_scores.map(x=>`<tr><td>${esc(x.name)}<td>${x.n}<td>${x.c}<td>${x.w}<td>${+(+x.m).toFixed(2)}`).join('')}</table></div>
+ <p><a class="btn ghost" href="#/analytics/${s.exam_id}">View performance analytics</a></p>
  <h3>Review</h3><p class=sub><a href=# data-f=all>All</a><a href=# data-f=bad>Wrong</a><a href=# data-f=un>Unattempted</a><a href=# data-f=ok>Correct</a></p><div id=rv>${rev('all')}</div>`;
  document.querySelectorAll('[data-f]').forEach(b=>b.onclick=e=>{e.preventDefault();$('#rv').innerHTML=rev(b.dataset.f)})}
